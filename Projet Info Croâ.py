@@ -27,7 +27,7 @@ L5 = ["brochets"]*6
 L6 = ["mâle"]*7
 L = L1 + L2 + L3 + L4 + L5 + L6
 
-def plateau(): #création d'un plateau alétoire à chaque partie
+def plateau(L): #création d'un plateau alétoire à chaque partie
     P=L.copy()
     shuffle(P) #on mélange aléatoirement les éléments de la liste
     return [P[0:8],P[8:16],P[16:24],P[24:32],P[32:40],P[40:48],P[48:56],P[56:64]]
@@ -39,12 +39,12 @@ L10=[0,0,0,0,0,0,0,2]
 L11=[0,0,0,0,0,0,2,200]
 L12=L8+L9+L7+L7+L7+L7+L10+L11
 
-def plateaubis():
+def plateaubis(L12):
     D=L12.copy()
     return [D[0:8],D[8:16],D[16:24],D[24:32],D[32:40],D[40:48],D[48:56],D[56:64]]
 
-plateau=plateau()
-plateaubis=plateaubis()
+plateau=plateau(L)
+plateaubis=plateaubis(L12)
 
 ## deplacement
 
