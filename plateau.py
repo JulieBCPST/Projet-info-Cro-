@@ -35,12 +35,12 @@ def SetUpPlateau(tab):
 
 def CreateTasCarte():
     #Initialisation des cartes
-    C1 = ["nenuphar"]*17
-    C2 = ["roseau"]*14
-    C3 = ["insecte"]*14
-    C4 = ["vase"]*6
-    C5 = ["brochets"]*6
-    C6 = ["mâle"]*7
+    C1 = ["Nenuphar"]*17
+    C2 = ["Roseau"]*14
+    C3 = ["Insecte"]*14
+    C4 = ["Vase"]*6
+    C5 = ["Brochets"]*6
+    C6 = ["Mâle"]*7
     TasC = C1 + C2 + C3 + C4 + C5 + C6
 
     tailleTas = len(TasC) #taille du tas
@@ -53,7 +53,18 @@ def CreateTasCarte():
         TasMelanger[i] = TasC[valAlea] #ajout de la carte choisi
         del(TasC[valAlea]) #suppression de la carte
 
-    return TasMelanger
+    tableaucarte = InitPlateau() # création d'un tableau vide
+    index = 0 # indice suivant la progression sur TasMélanger
+
+    for i in range (0,len(tableaucarte)): # parcours les colonnes
+        for j in range (0,len(tableaucarte[i])): #parcours les lignes
+            tableaucarte[i][j] = TasMelanger[index][0] #convertir la liste TasMelanger en tableau affichable
+            index += 1 #fais évoluer l'indice
+
+
+    return tableaucarte # retourne le tableau de carte
+
+##Fonction d'affichage
 
 
 #Affichage du plateau
@@ -81,23 +92,81 @@ def AffichePlateau(tab):
     #EndFor
 
 
+def AffichageCarte(tabCarte,tabVisi): # tableau des cartes révélées
+    tabResult = InitPlateau() #initialisation du plateau
+    for i in range (0,len(tabCarte)): #on parcourt les colonnes
+        for j in range (0,len(tabCarte[i])): #on parcourt les lignes
+            if tabVisi[i][j] == 1:#1=la carte a été révélée
+                tabResult[i][j]=tabCarte[i][j]#on rajoute la carte au tableau si elle a été révélée
+            else :
+                tabResult[i][j]='*'#la carte n'a pas été révélée
+    AffichePlateau(tabResult)#on affiche le tableau des cartes révélées
+
+## Fonction de jeu
+
+def Choixpion():#demande au joueur s'il veut changer de vision de plateau, jouer le pion qu'on lui propose ou demander qu'on lui propose un autre pion
+    rep=-1
+    while rep!=0 or rep!=1 or rep !=2 :#évite que rep prenne une autre valeur que celle demandée
+        rep=input("0 = jouer ce pion, 1 = choisir un autre pion, 2 = afficher une autre face du plateau")
+    return rep
+
+def Dircolonne (col):
+    possibilite = False
+    while possibilite == False:
+        dircol=2
+        while (dircol != 0 and dircol != 1 and dircol != -1):
+            dircol = int(input("-1 = aller à gauche, 0 = rester dans cette colonne, 1 = aller à droite : "))
+
+        if (dircol==-1 and col==0) or (dircol==1 and col==7):
+            possibilite = False
+            print ("La bataille ne se déroule que dans la mare, veuillez ne pas rejoindre la terre ferme. Choisissez un autre déplacement.")
+        else :
+            possibilite = True
+    return dircol
+
+def Dirligne (lig):
+    possibilite = False
+    while possibilite == False:
+        dirlig=2
+        while (dirlig != -1 and dirlig != 0 and dirlig != 1):
+            dirlig = int(input("-1 = aller en haut, 0 = rester dans cette ligne, 1 = aller en bas : "))
+        if (dirlig == -1 and lig == 0) or (dirlig == 1 and lig == 7):
+            possibilite = False
+            print ("Vous ne pouvez pas faire ça, veuillez rentrer un autre déplacement")
+        else :
+            possibilite = True
+    return dirlig
+
+def Deplacementverifjoueur (lig, col, plateau):
+    collision = True
+    while collision :
+        possibilite = False
+
+        while possibilite == False :
+            dirlig = Dirligne(lig)
+            dircol = Dircolonne(col)
+
+            if ( dircol==0 and dirlig==0):
+                possibilite = False
+                print ("Vous n'êtes pas une vraie grenouille, veuillez ne pas sauter votre tour")
+            else :
+                possibilite = True
+
+        if plateau[col + dircol][lig + dirlig] == "J1" or plateau[col + dircol][lig + dirlig] == "g1":
+            collision = True
+            print("Le cannibalisme est autorisé uniquement entre grenouilles rivales" )
+        else:
+            collision = False
+    return dirlig, dircol
+
+
+
+
 ## FONCTION DE TEST
 
-# A NE PAS PRENDRE EN COMPTE
-def AfficheTab(tab):
-    for i in range (0,len(tab)):
-        print(tab[i])
-
-# A NE PAS PRENDRE EN COMPTE
-def AfficheTabColumn(tab):
-    for i in range (0,len(tab)):
-        for j in range (0,len(tab[i])):
-            print(tab[i][j],end="")
-        print("")
 
 
 
 tab = InitPlateau()
-#AfficheTab(tab)
-tab = SetUpPlateau(tab)
-AffichePlateau(tab)
+plateau = SetUpPlateau(tab)
+Deplacementverifjoueur(0,0,plateau)
