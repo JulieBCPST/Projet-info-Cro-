@@ -1,6 +1,6 @@
 ## IMPORTATION
 from random import *
-
+import time
 
 ## FONCTION INITIALISATION
 
@@ -106,17 +106,23 @@ def AffichageCarte(tabCarte,tabVisi): # tableau des cartes révélées
 
 
 def AffichePionSelectionne(tab,i,j):
-    pion = tab[i][j]
-    tab[i][j] = "->" + pion
-    AffichePlateau(tab)
-    tab[i][j] = pion
+    pion = tab[i][j] # récupère le pion
+    tab[i][j] = "->" + pion # ajoute à la case une flèche pour montrer à l'utilisateur ce qui est sélectionné
+    AffichePlateau(tab) # afficher le tableau avec le pion selectionné
+    tab[i][j] = pion # rétablir la case en enlevant la flèche
 
 
 def AffichePlateauAlterner(typePlateau,plateauPion,plateauCarte,tabVisi):
-    if(typePlateau == -1):
+    if(typePlateau == -1): # si c'est -1 afficher les pions
         AffichePlateau(plateauPion)
-    else:
+    else:# si c'est 1 afficher les carte
         AffichageCarte(plateauCarte,tabVisi)
+
+
+def AffichePlateauAlternerS(plateauPion,plateauCarte,tabVisi):
+    AffichageCarte(plateauCarte,tabVisi) #afficher les cartes
+    time.sleep(2) # attendre n secondes
+    AffichePlateau(plateauPion) #afficher plateau
 
 
 
@@ -178,12 +184,37 @@ def Deplacementverifjoueur (lig, col, plateau):
             collision = False
     return dirlig, dircol
 
-
+# version sans sleep
 def RecherchePion(plateauPion,plateauCarte,plateauVisible):
-    selectionne = False
+    selectionne = False # variable qui détermine si le joueur à selectionné ou non un pion
     i = 0
     j = 0
     typeAff = -1
+    while selectionne == False: # continue la fonction tans que aucun pion n'a été séléctionné
+        if(j == len(plateauPion)): # si le compteur est arriver au maximum de colonne
+            i += 1
+            j = 0
+        if(i == len(plateauPion)): # si le compteur est arriver au maximum de ligne
+            i = 0
+        if(plateauPion[i][j] == "J1" or plateauPion[i][j] == "g1"): # si les coordonnées donne sur un pion du joueur
+            rep = 2 # initialise une variable reponse
+            AffichePionSelectionne(plateauPion,i,j) # Affiche le pion séléctionné
+            while(rep == 2):
+                rep = Choixpion() # demande au joueur son choix
+                if(rep == 0): # le joueur choisit ce pion
+                    selectionne = True
+                    j -= 1 # sert à compensée le compteur
+                if(rep == 2): # afficher un autre plateau (carte ou pion)
+                    typeAff *= -1 # permet de connaitre quel plateau afficher
+                    AffichePlateauAlterner(typeAff,plateauPion,plateauCarte,plateauVisible) # afficher le plateau demander
+        j += 1
+    return i,j
+
+# version avec sleep
+def RecherchePionS(plateauPion,plateauCarte,plateauVisible):
+    selectionne = False
+    i = 0
+    j = 0
     while selectionne == False:
         if(j == len(plateauPion)):
             i += 1
@@ -199,19 +230,55 @@ def RecherchePion(plateauPion,plateauCarte,plateauVisible):
                     selectionne = True
                     j -= 1
                 if(rep == 2):
-                    typeAff *= -1
-                    AffichePlateauAlterner(typeAff,plateauPion,plateauCarte,plateauVisible)
+                    AffichePlateauAlternerS(plateauPion,plateauCarte,plateauVisible)
         j += 1
     return i,j
 
+def Carte(lig,col,plateauCarte):
+    carte = plateauCarte[col][lig]
+    if carte == "N":
+        return "rejoue"
+    if carte == "I":
+        return "relais"
+    if carte == "M":
+        return "male"
+    if carte == "M1":
+        return "male1"
+    if carte == "M2":
+        return "male2"
+    if carte == "V":
+        return "vase"
+    if carte == "B":
+        return "brochet"
+
+    return "passe"
+
+
 def Deplacement(plateauPion,plateauCarte,plateauVisible):
-    i,j = RecherchePion(plateauPion,plateauCarte,plateauVisible)
-    dirlig, dircol = Deplacementverifjoueur(i, j, plateauPion)
-    plateauPion[i+dirlig][j+dircol] = plateauPion[i][j]
-    plateauPion[i][j] = 0
-    return plateauPion,plateauCarte,plateauVisible
+    i,j = RecherchePionS(plateauPion,plateauCarte,plateauVisible) # retourne les coordonnée du pion séléctionné
+    dirlig, dircol = Deplacementverifjoueur(i, j, plateauPion) # retourne les résultats du déplacements
+    plateauPion[i+dirlig][j+dircol] = plateauPion[i][j] # déplace le pion
+    plateauPion[i][j] = 0 # retire l'ancien pion
+    return plateauPion,plateauCarte,plateauVisible # retourne les plateaux modifiés
 
+def IsFinish(plateauPion): # parcour le plateau de pion est vérifie si toutes les rênes sont présentes
+    j1IsHere = False
+    j2IsHere = False
+    for col in range (0,len(plateauPion)):
+        for lig in range (0,len(plateauPion[col])):
+            if(plateauPion[col][lig] == "J1"):
+                j1IsHere = True
+            if(plateauPion[col][lig] == "J2"):
+                j2IsHere = True
 
+    if(j1IsHere == True and j2IsHere == True):
+        return "continuer"
+    if(j1IsHere == False and j2IsHere == False)
+        return "egalite"
+    if(j1IsHere == False)
+        return "j2gagne"
+    if(j2IsHere == False)
+        return "j1gagne"
 
 
 ## FONCTION DE TEST
