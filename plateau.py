@@ -4,6 +4,8 @@ from random import *
 
 ## FONCTION INITIALISATION
 
+plateau = []
+
 #initialiser un tableau
 def InitPlateau():
     #création du tableau avec une case
@@ -94,20 +96,36 @@ def AffichePlateau(tab):
 
 def AffichageCarte(tabCarte,tabVisi): # tableau des cartes révélées
     tabResult = InitPlateau() #initialisation du plateau
-    for i in range (0,len(tabCarte)): #on parcourt les colonnes
-        for j in range (0,len(tabCarte[i])): #on parcourt les lignes
+    for i in range (0,len(tabCarte)): #on parcourt les lignes
+        for j in range (0,len(tabCarte[i])): #on parcourt les collones
             if tabVisi[i][j] == 1:#1=la carte a été révélée
                 tabResult[i][j]=tabCarte[i][j]#on rajoute la carte au tableau si elle a été révélée
             else :
                 tabResult[i][j]='*'#la carte n'a pas été révélée
     AffichePlateau(tabResult)#on affiche le tableau des cartes révélées
 
+
+def AffichePionSelectionne(tab,i,j):
+    pion = tab[i][j]
+    tab[i][j] = "->" + pion
+    AffichePlateau(tab)
+    tab[i][j] = pion
+
+
+def AffichePlateauAlterner(typePlateau,plateauPion,plateauCarte,tabVisi):
+    if(typePlateau == -1):
+        AffichePlateau(plateauPion)
+    else:
+        AffichageCarte(plateauCarte,tabVisi)
+
+
+
 ## Fonction de jeu
 
 def Choixpion():#demande au joueur s'il veut changer de vision de plateau, jouer le pion qu'on lui propose ou demander qu'on lui propose un autre pion
     rep=-1
-    while rep!=0 or rep!=1 or rep !=2 :#évite que rep prenne une autre valeur que celle demandée
-        rep=input("0 = jouer ce pion, 1 = choisir un autre pion, 2 = afficher une autre face du plateau")
+    while (rep!=0 and rep!=1 and rep !=2) :#évite que rep prenne une autre valeur que celle demandée
+        rep=int(input("0 = jouer ce pion, 1 = choisir un autre pion, 2 = afficher une autre face du plateau"))
     return rep
 
 def Dircolonne (col):
@@ -137,6 +155,7 @@ def Dirligne (lig):
             possibilite = True
     return dirlig
 
+
 def Deplacementverifjoueur (lig, col, plateau):
     collision = True
     while collision :
@@ -160,13 +179,51 @@ def Deplacementverifjoueur (lig, col, plateau):
     return dirlig, dircol
 
 
+def RecherchePion(plateauPion,plateauCarte,plateauVisible):
+    selectionne = False
+    i = 0
+    j = 0
+    typeAff = -1
+    while selectionne == False:
+        if(j == len(plateauPion)):
+            i += 1
+            j = 0
+        if(i == len(plateauPion)):
+            i = 0
+        if(plateauPion[i][j] == "J1" or plateauPion[i][j] == "g1"):
+            rep = 2
+            AffichePionSelectionne(plateauPion,i,j)
+            while(rep == 2):
+                rep = Choixpion()
+                if(rep == 0):
+                    selectionne = True
+                    j -= 1
+                if(rep == 2):
+                    typeAff *= -1
+                    AffichePlateauAlterner(typeAff,plateauPion,plateauCarte,plateauVisible)
+        j += 1
+    return i,j
+
+def Deplacement(plateauPion,plateauCarte,plateauVisible):
+    i,j = RecherchePion(plateauPion,plateauCarte,plateauVisible)
+    dirlig, dircol = Deplacementverifjoueur(i, j, plateauPion)
+    plateauPion[i+dirlig][j+dircol] = plateauPion[i][j]
+    plateauPion[i][j] = 0
+    return plateauPion,plateauCarte,plateauVisible
+
+
 
 
 ## FONCTION DE TEST
 
+plateau = InitPlateau()
+plateau = SetUpPlateau(plateau)
+carte = CreateTasCarte()
+tableVisi = InitPlateau()
+tableVisi[0][0] = 1
+tableVisi[1][0] = 1
+tableVisi[0][1] = 1
+plateau,carte,tableVisi = Deplacement(plateau,carte,tableVisi)
 
-
-
-tab = InitPlateau()
-plateau = SetUpPlateau(tab)
-Deplacementverifjoueur(0,0,plateau)
+AffichePlateau(plateau)
+#print("i = ",i," j = ",j," dirlig = ",dirlig," dircol = ",dircol)
