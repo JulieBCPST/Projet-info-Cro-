@@ -144,7 +144,7 @@ def AffichePlateauAlternerS(plateauPion,plateauCarte,tabVisi):
 def Choixpion():#demande au joueur s'il veut changer de vision de plateau, jouer le pion qu'on lui propose ou demander qu'on lui propose un autre pion
     rep=-1
     while rep != 0 and rep != 1 and rep !=2 :#évite que rep prenne une autre valeur que celle demandée
-        rep=int(input("0 = jouer ce pion, 1 = choisir un autre pion, 2 = afficher une autre face du plateau"))
+        rep=int(input("0 = jouer ce pion, 1 = choisir un autre pion, 2 = afficher une autre face du plateau : "))
         print(rep)
     return rep
 
@@ -254,7 +254,7 @@ def TourJoueur(plateauPion,plateauCarte,plateauVisible):
         plateauPion = Brochet(newLig,newCol,plateauPion)
     elif reponse == "Relai":
         print("!!! fonction relais non actif !!!")
-    elif reponse == "Male2" or reponse == "Male":
+    elif (reponse == "Male2" or reponse == "Male") and plateauPion[newLig][newCol] == "J1":
         plateauPion,plateauCarte = MaleJ1 (newLig,newCol,plateauPion,plateauCarte)
     elif reponse == "Vase":
         plateauPion = Vase (newLig,newCol,plateauPion)
@@ -275,15 +275,37 @@ def Jeu():
     plateauVisible[7][7] = 1
     plateauVisible[6][7] = 1
     plateauVisible[7][6] = 1
+
+    vaseAction = []
     while rep == "La bataille se poursuit.":
+        NettoyageVase(plateauPion,vaseAction)
         plateauPion,plateauCarte,plateauVisible = TourJoueur(plateauPion,plateauCarte,plateauVisible)
         rep = IsFinish(plateauPion)
 
     print(rep)
     print("////fin du jeu")
 
-def NettoyageVase(plateauPion):
-    return plateauPion
+def NettoyageVase(plateauPion,vaseAction):
+    max = len(vaseAction)
+    #retirage de l'effet vase
+    for i in range (0,max):
+        col = int(vaseAction[0][0])
+        lig = int(vaseAction[0][1])
+        pion = plateauPion[col][lig]
+        pionDecomposer = list(pion)
+        newPion = ""
+        for j in range(1,len(pionDecomposer)):
+            newPion = newPion + pionDecomposer[j]
+        plateauPion[col][lig] = newPion
+
+    #programmer le nettoyage pour le prochain passage
+    for col in range (0,len(plateauPion)):
+        for lig in range (0,len(plateauPion[col])):
+            case = str(plateauPion[col][lig])
+            if(case[0] == 'V'):
+                vaseAction.append(str(col) + str(lig))
+
+    return plateauPion, vaseAction
 
 ### EFFET CARTE
 
