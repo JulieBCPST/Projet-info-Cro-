@@ -279,33 +279,46 @@ def Jeu():
     vaseAction = []
     while rep == "La bataille se poursuit.":
         NettoyageVase(plateauPion,vaseAction)
-        plateauPion,plateauCarte,plateauVisible = TourJoueur(plateauPion,plateauCarte,plateauVisible)
+        if(J1PeutJouer(plateauPion)):
+            plateauPion,plateauCarte,plateauVisible = TourJoueur(plateauPion,plateauCarte,plateauVisible)
+
         rep = IsFinish(plateauPion)
 
     print(rep)
     print("////fin du jeu")
 
 def NettoyageVase(plateauPion,vaseAction):
-    max = len(vaseAction)
+    max = len(vaseAction) # recupération du nombre de nettoyage
     #retirage de l'effet vase
-    for i in range (0,max):
+    for i in range (0,max): # la boucle s'active uniquement si il y a des actions à faire
+        # recupère les coordonnées
         col = int(vaseAction[0][0])
         lig = int(vaseAction[0][1])
-        pion = plateauPion[col][lig]
-        pionDecomposer = list(pion)
-        newPion = ""
+        pion = plateauPion[col][lig] # récupère le pion
+        pionDecomposer = list(pion) # décompose le mot pour le transformer en tableau de charactères
+        newPion = "" # nouveau pion
+        # récupère tous les charactères de l'ancien pion sauf le premier qui est le "V"
         for j in range(1,len(pionDecomposer)):
             newPion = newPion + pionDecomposer[j]
-        plateauPion[col][lig] = newPion
+        plateauPion[col][lig] = newPion # attribue la nouvelle valeur
 
     #programmer le nettoyage pour le prochain passage
     for col in range (0,len(plateauPion)):
         for lig in range (0,len(plateauPion[col])):
             case = str(plateauPion[col][lig])
-            if(case[0] == 'V'):
+            if(case[0] == 'V'): # verifie si un pion possède l'effet vase
                 vaseAction.append(str(col) + str(lig))
 
     return plateauPion, vaseAction
+
+def J1PeutJouer(plateauPion):
+    for col in range(0,len(plateauPion)):
+        for lig in range(0,len(plateauPion[col])):
+            if(plateauPion[col][lig] == "J1" or plateauPion[col][lig] == "g1"):
+                return True
+
+    return False
+
 
 ### EFFET CARTE
 
