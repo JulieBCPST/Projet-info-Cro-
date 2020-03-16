@@ -250,7 +250,9 @@ def DeplacementN (plateauPion,plateauCarte,plateauVisible,col,lig):
     dirlig,dircol=Deplacementverifjoueur(col,lig,plateauPion)
     plateauPion[lig+dirlig][col+dircol]=plateauPion[lig][col]
     plateauPion[lig][col]=0
-    return plateauPion,plateauCarte,plateauVisible,lig+dirlig,col+dircol
+    col=dircol+col
+    lig=dirlig+lig
+    return plateauPion,plateauCarte,plateauVisible,lig,col
 
 
 
@@ -283,8 +285,6 @@ def Carte (lig, col, plateaucarte): #retourne la carte sur laquelle le pion arri
 #Nenuphar
 
 def Nenuphar (lig,col,plateauPion,plateauCarte,plateauVisible):
-    newLig = 0
-    newCol = 0
     plateauPion,plateauCarte,plateauVisible,lig,col = DeplacementN (plateauPion,plateauCarte,plateauVisible,col,lig)
     plateauVisible[lig][col] = 1
     reponse = Carte (lig, col, plateauCarte)
@@ -294,10 +294,10 @@ def Nenuphar (lig,col,plateauPion,plateauCarte,plateauVisible):
         plateauPion = Brochet(lig,col,plateauPion)
     elif reponse == "Relai":
         print("!!! fonction relais non actif !!!")
-    elif (reponse == "Male2" or reponse == "Male") and plateauPion[newLig][newCol] == "J1":
-        plateauPion,plateauCarte = MaleJ1 (newLig,newCol,plateauPion,plateauCarte)
+    elif (reponse == "Male2" or reponse == "Male") and plateauPion[lig][col] == "J1":
+        plateauPion,plateauCarte = MaleJ1 (lig,col,plateauPion,plateauCarte)
     elif reponse == "Vase":
-        plateauPion = Vase (newLig,newCol,plateauPion)
+        plateauPion = Vase (lig,col,plateauPion)
     elif reponse == "Rejoue":
         plateauPion,plateauCarte,plateauVisible,col,lig=Nenuphar(lig,col,plateauPion,plateauCarte,plateauVisible)
     return plateauPion,plateauCarte,plateauVisible,col,lig
