@@ -110,9 +110,12 @@ def AffichageCarte(tabCarte,tabVisi): # tableau des cartes révélées
         for j in range (0,len(tabCarte[i])): #on parcourt les lignes
             if tabVisi[i][j] == 1:#1=la carte a été révélée
                 tabResult[i][j]=tabCarte[i][j]#on rajoute la carte au tableau si elle a été révélée
+            elif tabCarte[i][j]==B or tabCarte[i][j]==N or tabCarte[i][j]==I:
+                tabResult[i][j]='D'#la carte n'a pas été révélée et le chemin est dangereux mais rapide
             else :
-                tabResult[i][j]='*'#la carte n'a pas été révélée
+                tabResult[i][j]='P'#la carte n'a pas été révélée et le chemin est prudent mais lent
     AffichePlateau(tabResult)#on affiche le tableau des cartes révélées
+
 
 ## Affichage d'un plateau avec un caractère modifié
 #affiche une flèche permettant au joueur de savoir par rapport à quel pion est posé la question
