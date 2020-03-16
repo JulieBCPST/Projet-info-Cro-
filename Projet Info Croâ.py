@@ -17,15 +17,15 @@ def InitPlateau(): #crée un tableau vide pouvant être utilisé pour créer les
 
 ##Plateaux de jeu
 #initialiser les valeurs initiales
-def Plateauemplacement(tab):
+def Plateauemplacement(tableauvide):
     #Extremitée haut gauche
     tab[0][0] = "J1" #reine du joueur 1
     tab[1][0] = "g1" #grenouille du joueur 1
     tab[0][1] = "g1"
 
     #Extremitée bas droit
-    extremite = len(tab)-1
-    extremite2 = len(tab[extremite])-1
+    extremite = len(tab)-1 #compte le nombre de colonne
+    extremite2 = len(tab[extremite])-1#compte le nombre de ligne
 
     tab[extremite][extremite2] = "J2" #reine du joueur 2
     tab[(extremite-1)][extremite2] = "g2"#grenouille du joueur 2
@@ -73,7 +73,7 @@ def IsFinish(plateauPion): # parcourt le plateau de pion et vérifie si toutes l
     if(j1IsHere == True and j2IsHere == True): # les deux reines ont été trouvées
         return ("La bataille se poursuit.")
     if(j1IsHere == False and j2IsHere == False) :#aucune des reines n'a été trouvée
-        return ("La bataille est terminée, mais les deux camps sont éléminés, personne ne gagne.")
+        return ("La bataille est terminée, mais les deux camps sont éliminés, personne ne gagne.")
     if(j1IsHere == False) : # si la reine du joueur 1 n'a pas été trouvée
         return ("La bataille est terminée, vous avez perdu.")
     if(j2IsHere == False) : # si la reine du joueur 2 n'a pas été trouvée
@@ -110,12 +110,11 @@ def AffichageCarte(tabCarte,tabVisi): # tableau des cartes révélées
         for j in range (0,len(tabCarte[i])): #on parcourt les lignes
             if tabVisi[i][j] == 1:#1=la carte a été révélée
                 tabResult[i][j]=tabCarte[i][j]#on rajoute la carte au tableau si elle a été révélée
-            elif tabCarte[i][j]=="B" or tabCarte[i][j]=="N" or tabCarte[i][j]=="I":
+            elif tabCarte[i][j]==B or tabCarte[i][j]==N or tabCarte[i][j]==I:
                 tabResult[i][j]='D'#la carte n'a pas été révélée et le chemin est dangereux mais rapide
             else :
                 tabResult[i][j]='P'#la carte n'a pas été révélée et le chemin est prudent mais lent
     AffichePlateau(tabResult)#on affiche le tableau des cartes révélées
-
 
 ## Affichage d'un plateau avec un caractère modifié
 #affiche une flèche permettant au joueur de savoir par rapport à quel pion est posé la question
@@ -154,14 +153,14 @@ def Choixpion():#demande au joueur s'il veut changer de vision de plateau, jouer
 
 # version avec sleep
 def RecherchePionS(plateauPion,plateauCarte,plateauVisible): #parcourt le plateau tant que le joueur ne choisit pas de pion
-    selectionne = False #le joueur n'a toujours pas sséletionné de pion
+    selectionne = False #le joueur n'a toujours pas sélectionné de pion
     col = 0 #démarre à (0,0)
     lig = 0
     while selectionne == False:#tant que le joueur ne sélectionne pas de pion on parcourt le plateau
-        if(col == len(plateauPion)):#si l'on est en bout de ligne
+        if(col == len(plateauPion)):#si l'on est sorti de la ligne
             lig += 1 #on saute une ligne
             col = 0 #on revient à une première colonne
-        if(lig == len(plateauPion)) and (col==len(plateauPion)): # si l'on est en (7,7)
+        if(lig == len(plateauPion)): # si l'on est en (8,0)
             lig = 0 # on revient à (0,0)
             col = 0
         if(plateauPion[col][lig] == "J1" or plateauPion[col][lig] == "g1"):#si la case sur laquelle est arrivée est occupé par un pion allié
@@ -194,6 +193,8 @@ def Dircolonne (col): #demande un déplacement sur les colonnes au joueur et vé
             possibilite = True #le déplacement est vérifié comme possible
     return dircol
 
+
+
 def Dirligne (lig):#demande un déplacement sur les lignes au joueur et vérifie qu'il ne sort pas du plateau
     possibilite = False #variable vérifiant la possibilité de déplacement
     while possibilite == False:
@@ -206,6 +207,8 @@ def Dirligne (lig):#demande un déplacement sur les lignes au joueur et vérifie
         else :
             possibilite = True #le déplacement est vérifié comme possible
     return dirlig
+
+
 
 #demande les choix de déplacement du joueur et vérifie s'ils sont valides
 def Deplacementverifjoueur (lig, col, plateau):
@@ -223,7 +226,7 @@ def Deplacementverifjoueur (lig, col, plateau):
             else :
                 possibilite = True # le joueur bouge réellement
 
-        if plateau[col + dircol][lig + dirlig] == "J1" or plateau[col + dircol][lig + dirlig] == "g1" or plateau[col + dircol][lig + dirlig] == "Vg1" or plateau[col + dircol][lig + dirlig] == "VJ1": #si la case sur laquelle arrive le pion joué est déjà occupé par un allié
+        if plateau[lig + dirlig][col + dircol] == "J1" or plateau[lig + dirlig][col + dircol] == "g1" or plateau[lig + dirlig][col + dircol] == "Vg1" or plateau[lig] + dirlig][col + dircol] == "VJ1": #si la case sur laquelle arrive le pion joué est déjà occupé par un allié
             collision = True
             print("Manger ses alliés est une mauvaise stratégie pour arriver jusqu'à la victoire" ) #indique que la case est déjà occupée
         else:
@@ -237,9 +240,20 @@ def Deplacementverifjoueur (lig, col, plateau):
 def Deplacement(plateauPion,plateauCarte,plateauVisible):
     col,lig = RecherchePionS(plateauPion,plateauCarte,plateauVisible) # retourne les coordonnées du pion séléctionné
     dirlig, dircol = Deplacementverifjoueur(col, lig, plateauPion) # retourne les résultats du déplacements
-    plateauPion[lig+dirlig][col+dircol] = plateauPion[col][lig] # déplace le pion en fonction des choix
+    plateauPion[lig+dirlig][col+dircol] = plateauPion[lig][col] # déplace le pion en fonction des choix
     plateauPion[lig][col] = 0 # retire l'ancien pion
     return plateauPion,plateauCarte,plateauVisible # retourne les plateaux modifiés
+
+
+
+def DeplacementN (plateauPion,plateauCarte,plateauVisible,col,lig):
+    dirlig,dircol=Deplacementverifjoueur(col,lig,plateauPion)
+    plateauPion[lig+dirlig][col+dircol]=plateauPion[lig][col]
+    plateauPion[lig][col]=0
+    return plateauPion,plateauCarte,plateauVisible,lig+dirlig,col+dircol
+
+
+
 
 ### EFFET CARTE
 
@@ -247,23 +261,47 @@ def Deplacement(plateauPion,plateauCarte,plateauVisible):
 
 def Carte (lig, col, plateaucarte): #retourne la carte sur laquelle le pion arrive
     carte=plateaucarte[col][lig]
-    if carte==N:#nénuphar
+    if carte=="N":#nénuphar
         return "Rejoue"
-    elif carte==I:#insecte
+    elif carte=="I":#insecte
         return "Relai"
-    elif carte==M:#mâle non utilisé
+    elif carte=="M":#mâle non utilisé
         return "Male"
-    elif carte==M1:#mâle utilisé par le joueur 1
+    elif carte=="M1":#mâle utilisé par le joueur 1
         return "Male1"
-    elif carte==M2:#mâle utilisé par le joueur 2
+    elif carte=="M2":#mâle utilisé par le joueur 2
         return "Male2"
-    elif carte==V:#vase
+    elif carte=="V":#vase
         return "Vase"
-    elif carte==B:#brochet
+    elif carte=="B":#brochet
         return "Brochet"
     return "Fin"#roseau
 
 ## Fonctions des cartes
+
+
+#Nenuphar
+
+def Nenuphar (lig,col,plateauPion,plateauCarte,plateauVisible):
+    newLig = 0
+    newCol = 0
+    plateauPion,plateauCarte,plateauVisible,lig,col = DeplacementN (plateauPion,plateauCarte,plateauVisible,col,lig)
+    plateauVisible[lig][col] = 1
+    reponse = Carte (lig, col, plateauCarte)
+    print("carte retourné : ",reponse)
+    time.sleep(2)
+    if reponse == "Brochet":
+        plateauPion = Brochet(lig,col,plateauPion)
+    elif reponse == "Relai":
+        print("!!! fonction relais non actif !!!")
+    elif (reponse == "Male2" or reponse == "Male") and plateauPion[newLig][newCol] == "J1":
+        plateauPion,plateauCarte = MaleJ1 (newLig,newCol,plateauPion,plateauCarte)
+    elif reponse == "Vase":
+        plateauPion = Vase (newLig,newCol,plateauPion)
+    elif reponse == "Rejoue":
+        plateauPion,plateauCarte,plateauVisible,col,lig=Nenuphar(lig,col,plateauPion,plateauCarte,plateauVisible)
+    return plateauPion,plateauCarte,plateauVisible,col,lig
+
 
 # Brochet
 
@@ -275,10 +313,10 @@ def Brochet (lig,col,plateauemplacement):
 
 def MaleJ1 (lig,col,plateauemplacement,plateaucarte):#le mâle peut être utilisé par le joueur 1
     j=0#colonne où l'on va placer la nouvelle grenouille
-    i=0#igne où l'on va placer la nouvelle grenouille
+    i=0#ligne où l'on va placer la nouvelle grenouille
     while plateauemplacement[j][i]!=0:#tant que la place sur laquelle la nouvelle grenouille naît est occupée on parcourt la plateau pour trouver une place libre
         if j == len (plateauemplacement): #si la colonne est est la dernière
-            j=0#on revient à la premiere collonne
+            j=0#on revient à la premiere colonne
             i+=1#on passe à la ligne suivante
         else :#si la colonne n'est pas la dernière
             j+=1#on passe à la colonne de droite
@@ -286,19 +324,19 @@ def MaleJ1 (lig,col,plateauemplacement,plateaucarte):#le mâle peut être utilis
     if plateaucarte[col][lig]=="M":#si le mâle n'a été utilisé par personne
         plateaucarte[col][lig]="M1"
     else :
-        plateaucarte[col][lig]="roseau"#si le mâle avait déjà été utilisé par le joueur 2, la carte devient inutile
+        plateaucarte[col][lig]="R"#si le mâle avait déjà été utilisé par le joueur 2, la carte devient inutile
 
 
 
 def MaleJ2 (lig,col,plateauemplacement,plateaucarte):#le mâle peut être utilisé par le joueur 2
-    j=0#colonne où l'on va placer la nouvelle grenouille
-    i=0#igne où l'on va placer la nouvelle grenouille
+    j=7#colonne où l'on va placer la nouvelle grenouille
+    i=7#igne où l'on va placer la nouvelle grenouille
     while plateauemplacement[j][i]!=0:#tant que la place sur laquelle la nouvelle grenouille naît est occupée on parcourt la plateau pour trouver une place libre
         if j == len (plateauemplacement): #si la colonne est est la dernière
             j=0#on revient à la premiere collonne
-            i+=1#on passe à la ligne suivante
+            i-=1#on passe à la ligne suivante
         else :#si la colonne n'est pas la dernière
-            j+=1#on passe à la colonne de droite
+            j-=1#on passe à la colonne de droite
     plateauemplacement[j][i]="g2"#la grenouille naît sur une place libre
     if plateaucarte[col][lig]=="M":#si le mâle n'a été utilisé par personne
         plateaucarte[col][lig]="M2"
@@ -317,6 +355,94 @@ def Vase (lig,col,plateauemplacement):
     elif plateauemplacement[col][lig]=="J2":
         plateauemplacement[col][lig]="VJ2"
 
+### Fonctions de tour
+
+def TourJoueur(plateauPion,plateauCarte,plateauVisible):
+    newLig = 0
+    newCol = 0
+    plateauPion,plateauCarte,plateauVisible,newLig,newCol = Deplacement(plateauPion,plateauCarte,plateauVisible)
+    plateauVisible[newLig][newCol] = 1
+    reponse = Carte (newLig, newCol, plateauCarte)
+    print("carte retourné : ",reponse)
+    time.sleep(2)
+    if reponse == "Brochet":
+        plateauPion = Brochet(newLig,newCol,plateauPion)
+    elif reponse == "Relai":
+        print("!!! fonction relais non actif !!!")
+    elif (reponse == "Male2" or reponse == "Male") and plateauPion[newLig][newCol] == "J1":
+        plateauPion,plateauCarte = MaleJ1 (newLig,newCol,plateauPion,plateauCarte)
+    elif reponse == "Vase":
+        plateauPion = Vase (newLig,newCol,plateauPion)
+    elif reponse == "Rejoue":
+        plateauPion,plateauCarte,plateauVisible,col,lig=Nenuphar(lig,col,plateauPion,plateauCarte,plateauVisible)
+    return plateauPion,plateauCarte,plateauVisible
+
+
+def NettoyageVase(plateauPion,vaseAction):
+    max = len(vaseAction) # recupération du nombre de nettoyage
+    #retirage de l'effet vase
+    for i in range (0,max): # la boucle s'active uniquement si il y a des actions à faire
+        # recupère les coordonnées
+        col = int(vaseAction[0][0])
+        lig = int(vaseAction[0][1])
+        pion = plateauPion[col][lig] # récupère le pion
+        pionDecomposer = list(pion) # décompose le mot pour le transformer en tableau de charactères
+        newPion = "" # nouveau pion
+        # récupère tous les charactères de l'ancien pion sauf le premier qui est le "V"
+        for j in range(1,len(pionDecomposer)):
+            newPion = newPion + pionDecomposer[j]
+        plateauPion[col][lig] = newPion # attribue la nouvelle valeur
+        vaseAction.pop(0)
+
+    #programmer le nettoyage pour le prochain passage
+    for col in range (0,len(plateauPion)):
+        for lig in range (0,len(plateauPion[col])):
+            case = str(plateauPion[col][lig])
+            if(case[0] == 'V'): # verifie si un pion possède l'effet vase
+                vaseAction.append(str(col) + str(lig))
+
+    return plateauPion, vaseAction
+
+def J1PeutJouer(plateauPion):
+    for col in range(0,len(plateauPion)):
+        for lig in range(0,len(plateauPion[col])):
+            if(plateauPion[col][lig] == "J1" or plateauPion[col][lig] == "g1"):
+                return True
+
+    return False
+
+def Jeu():
+    #initialisation
+    plateauVisible = InitPlateau()
+    plateauPion = Plateauemplacement(InitPlateau())
+    plateauCarte = CreateTasCarte()
+    rep = "La bataille se poursuit."
+    plateauVisible[0][0] = 1
+    plateauVisible[1][0] = 1
+    plateauVisible[0][1] = 1
+    plateauVisible[7][7] = 1
+    plateauVisible[6][7] = 1
+    plateauVisible[7][6] = 1
+
+    vaseAction = []
+    while rep == "La bataille se poursuit.":
+        NettoyageVase(plateauPion,vaseAction)
+        if(J1PeutJouer(plateauPion)):
+            plateauPion,plateauCarte,plateauVisible = TourJoueur(plateauPion,plateauCarte,plateauVisible)
+
+        rep = IsFinish(plateauPion)
+
+    print(rep)
+    print("////fin du jeu")
+
+
+
+
+
+
+
+
+
 ### FONCTION DE TEST
 
 
@@ -324,6 +450,6 @@ def Vase (lig,col,plateauemplacement):
 
 tab = InitPlateau()
 plateau = Plateauemplacement(tab)
-Deplacementverifjoueur(0,0,plateau)
+AffichePlateau(tab)
 
 time.sleep(2)
