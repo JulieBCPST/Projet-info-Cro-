@@ -358,21 +358,19 @@ def Vase (lig,col,plateauemplacement):
 ### Fonctions de tour
 
 def TourJoueur(plateauPion,plateauCarte,plateauVisible):
-    newLig = 0
-    newCol = 0
-    plateauPion,plateauCarte,plateauVisible,newLig,newCol = Deplacement(plateauPion,plateauCarte,plateauVisible)
-    plateauVisible[newLig][newCol] = 1
-    reponse = Carte (newLig, newCol, plateauCarte)
+    plateauPion,plateauCarte,plateauVisible,lig,col = Deplacement(plateauPion,plateauCarte,plateauVisible)
+    plateauVisible[lig][col] = 1
+    reponse = Carte (lig,col, plateauCarte)
     print("carte retourné : ",reponse)
     time.sleep(2)
     if reponse == "Brochet":
-        plateauPion = Brochet(newLig,newCol,plateauPion)
+        plateauPion = Brochet(lig,col,plateauPion)
     elif reponse == "Relai":
         print("!!! fonction relais non actif !!!")
-    elif (reponse == "Male2" or reponse == "Male") and plateauPion[newLig][newCol] == "J1":
-        plateauPion,plateauCarte = MaleJ1 (newLig,newCol,plateauPion,plateauCarte)
+    elif (reponse == "Male2" or reponse == "Male") and plateauPion[lig][col] == "J1":
+        plateauPion,plateauCarte = MaleJ1 (lig,col,plateauPion,plateauCarte)
     elif reponse == "Vase":
-        plateauPion = Vase (newLig,newCol,plateauPion)
+        plateauPion = Vase (lig,col,plateauPion)
     elif reponse == "Rejoue":
         plateauPion,plateauCarte,plateauVisible,col,lig=Nenuphar(lig,col,plateauPion,plateauCarte,plateauVisible)
     return plateauPion,plateauCarte,plateauVisible
