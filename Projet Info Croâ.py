@@ -104,7 +104,7 @@ def AffichePlateau(tab):
     #EndFor
 
 #Affichage des cartes révélées
-def AffichageCarte(tabCarte,tabVisi): # tableau des cartes révélées
+def AffichageCarte(tabCarte,tabVisi): # affichage du tableau des cartes révélées
     tabResult = InitPlateau() #initialisation du plateau
     for col in range (0,len(tabCarte)): #on parcourt les colonnes
         for lig in range (0,len(tabCarte[i])): #on parcourt les lignes
@@ -115,6 +115,18 @@ def AffichageCarte(tabCarte,tabVisi): # tableau des cartes révélées
             else :
                 tabResult[lig][col]='P'#la carte n'a pas été révélée et le chemin est prudent mais lent
     AffichePlateau(tabResult)#on affiche le tableau des cartes révélées
+
+def plateauResult (tabCarte,tabVisi)): #retourne le tableau des cartes visibles pour l'utiliser ensuite
+    tabResult = InitPlateau() #initialisation du plateau
+    for col in range (0,len(tabCarte)): #on parcourt les colonnes
+        for lig in range (0,len(tabCarte[i])): #on parcourt les lignes
+            if tabVisi[lig][col] == 1:#1=la carte a été révélée
+                tabResult[lig][col]=tabCarte[lig][col]#on rajoute la carte au tableau si elle a été révélée
+            elif tabCarte[lig][col]==B or tabCarte[lig][col]==N or tabCarte[lig][col]==I:
+                tabResult[lig][col]='D'#la carte n'a pas été révélée et le chemin est dangereux mais rapide
+            else :
+                tabResult[lig][col]='P'#la carte n'a pas été révélée et le chemin est prudent mais lent
+    return tabResult
 
 ## Affichage d'un plateau avec un caractère modifié
 #affiche une flèche permettant au joueur de savoir par rapport à quel pion est posé la question
@@ -165,7 +177,7 @@ def RecherchePionS(plateauPion,plateauCarte,plateauVisible): #parcourt le platea
             col = 0
         if(plateauPion[lig][col] == "J1" or plateauPion[lig][col] == "g1"):#si la case sur laquelle est arrivée est occupé par un pion allié
             rep = 2
-            AffichePionSelectionne(plateauPion,col,lig) # affiche au joueur sur quel pion est posé la question
+            AffichePionSelectionne(plateauPion,lig,col) # affiche au joueur sur quel pion est posé la question
             while(rep == 2):
                 rep = Choixpion() #demande au joueur s'il veut jouer ce pion
                 if(rep == 0):#si le joueur choisit de jouer ce pion
@@ -174,10 +186,108 @@ def RecherchePionS(plateauPion,plateauCarte,plateauVisible): #parcourt le platea
                 if(rep == 2): # affiche le plateau des cartes et des pions alternativement si le joueur le souhaite
                     AffichePlateauAlternerS(plateauPion,plateauCarte,plateauVisible) #version avec sleep
         col += 1 # modifie la colonne pour parcourir le pateau
-    return col,lig
+    return lig,col
 
 
-## Fonction de choix et de vérification des déplacements
+##Choix chion IA
+
+def ChoixpionIAprep (plateauPion):#phase 1 de la stratégie
+    etat=0 # 0=stratégie, 1=la reine ou un pion est en danger, 2 = un pion est à manger, 3 = une reine est à manger
+    for lig in range (0,len(plateauPion)):
+        for col in range(0,len(plateauPion[lig])):
+            if plateauPion[lig][col]=="J2":#la protection de la reine est prioritaire
+                if plateauPion[lig+2][col]=="g1" or plateauPion[lig+2][col+1]=="g1"or plateauPion[lig+2][col-1]=="g1" or plateauPion[lig+1][col+2]=="g1" or plateauPion[lig+1][col-2]=="g1" or plateauPion[lig][col-2]=="g1" or plateauPion[lig][col+2]=="g1" or plateauPion[lig-1][col-2]=="g1" or plateauPion[lig-1][col+2]=="g1" or plateauPion[lig-2][col-1]=="g1" or plateauPion[lig-2][col]=="g1" or plateauPion[lig-2][col+1]=="g1" or plateauPion[lig+2][col]=="J1" or plateauPion[lig+2][col+1]=="J1" or plateauPion[lig+2][col-1]=="J1" or plateauPion[lig+1][col+2]=="J1" or plateauPion[lig+1][col-2]=="J1" or plateauPion[lig][col-2]=="J1" or plateauPion[lig][col+2]=="J1" or plateauPion[lig-1][col-2]=="J1" or plateauPion[lig-1][col+2]=="J1" or plateauPion[lig-2][col-1]=="J1" or plateauPion[lig-2][col]=="J1" or plateauPion[lig-2][col+1]=="J1":#vérifie si le pion risque de se faire manger au tour suivant
+                etat=1
+                return lig,col,etat
+
+
+            elif plateauPion[lig][col]=="j2": #la protection est prioritaire à l'attaque d'un autre pion
+                elif plateauPion[lig+2][col]=="g1" or plateauPion[lig+2][col+1]=="g1" or plateauPion[lig+2][col-1]=="g1" or plateauPion[lig+1][col+2]=="g1" or plateauPion[lig+1][col-2]=="g1" or plateauPion[lig][col-2]=="g1" or plateauPion[lig][col+2]=="g1" or plateauPion[lig-1][col-2]=="g1" or plateauPion[lig-1][col+2]=="g1" or plateauPion[lig-2][col-1]=="g1" or plateauPion[lig-2][col]=="g1" or plateauPion[lig-2][col+1]=="g1" or plateauPion[lig+2][col]=="J1" or plateauPion[lig+2][col+1]=="J1" or plateauPion[lig+2][col-1]=="J1" or plateauPion[lig+2][col-2]=="J1" or plateauPion[lig+1][col+2]=="J1" or plateauPion[lig+1][col-2]=="J1" or plateauPion[lig][col-2]=="J1" or plateauPion[lig][col+2]=="J1" or plateauPion[lig-1][col-2]=="J1" or plateauPion[lig-1][col+2]=="J1" or plateauPion[lig-2][col-1]=="J1" or plateauPion[lig-2][col]=="J1" or plateauPion[lig-2][col+1]=="J1":#vérifie si le pion risque de se faire manger au tour suivant
+                    etat=1
+                    return lig,col,etat
+
+
+            elif plateauPion[lig][col]=="J2": #l'attaque par la reine et d'une reine est prioritaire sur celle d'un  pion
+                if plateauPion[lig+1][col]=="J1" or plateauPion[lig+1][col+1]=="J1" or plateauPion[lig-1][col-1]=="J1" or plateauPion[lig][col+1]=="J1" or plateauPion[lig-1][col+1]=="J1" or plateauPion[lig+1][col-1]=="J1" or plateauPion[lig-1][col]=="J1" or plateauPion[lig][col-1]=="J1":#vérifie s'il y a une reine à manger aux alentours
+                    etat=3
+                    return lig,col,etat
+
+            elif plateauPion[lig][col]=="g2": #l'attaque d'une reine est prioritaire sur celle d'un  pion
+                if plateauPion[lig+1][col]=="J1" or plateauPion[lig+1][col+1]=="J1" or plateauPion[lig-1][col-1]=="J1" or plateauPion[lig][col+1]=="J1" or plateauPion[lig-1][col+1]=="J1" or plateauPion[lig+1][col-1]=="J1" or plateauPion[lig-1][col]=="J1" or plateauPion[lig][col-1]=="J1":#vérifie s'il y a une reine à manger aux alentours
+                    etat=3
+                    return lig,col,etat
+
+
+            elif plateauPion[lig][col]=="J2":
+                if plateauPion[lig+1][col]=="g1" or plateauPion[lig+1][col+1]=="g1" or plateauPion[lig-1][col-1]=="g1" or plateauPion[lig][col+1]=="g1" or plateauPion[lig-1][col+1]=="g1" or plateauPion[lig+1][col-1]=="g1" or plateauPion[lig-1][col]=="g1" or plateauPion[lig][col-1]=="g1":
+                    etat=2
+                    return lig,col,etat
+
+            elif plateauPion[lig][col]=="g2":
+                if plateauPion[lig+1][col]=="g1" or plateauPion[lig+1][col+1]=="g1" or plateauPion[lig-1][col-1]=="g1" or plateauPion[lig][col+1]=="g1" or plateauPion[lig-1][col+1]=="g1" or plateauPion[lig+1][col-1]=="g1" or plateauPion[lig-1][col]=="g1" or plateauPion[lig][col-1]=="g1":
+                    etat=2
+                    return lig,col,etat
+
+    for lig in range (0,len(plateauPion)): #si aucune situation urgente n'a lieu, la stratégie peut se dérouler
+        for col in range(0,len(plateauPion[lig])):
+            if plateauPion=="J2":
+                return lig,col,etat
+
+
+
+
+def ChoixpionIAassaut (plateauPion):#phase 2 de la stratégie
+    etat=0 # 0=stratégie, 1=la reine ou un pion est en danger, 2 = un pion est à manger, 3 = une reine est à manger
+    for lig in range (0,len(plateauPion)):
+        for col in range(0,len(plateauPion[lig])):
+            if plateauPion[lig][col]=="J2":#la protection de la reine est prioritaire
+                if plateauPion[lig+2][col]=="g1" or plateauPion[lig+2][col+1]=="g1"or plateauPion[lig+2][col-1]=="g1" or plateauPion[lig+1][col+2]=="g1" or plateauPion[lig+1][col-2]=="g1" or plateauPion[lig][col-2]=="g1" or plateauPion[lig][col+2]=="g1" or plateauPion[lig-1][col-2]=="g1" or plateauPion[lig-1][col+2]=="g1" or plateauPion[lig-2][col-1]=="g1" or plateauPion[lig-2][col]=="g1" or plateauPion[lig-2][col+1]=="g1" or plateauPion[lig+2][col]=="J1" or plateauPion[lig+2][col+1]=="J1" or plateauPion[lig+2][col-1]=="J1" or plateauPion[lig+1][col+2]=="J1" or plateauPion[lig+1][col-2]=="J1" or plateauPion[lig][col-2]=="J1" or plateauPion[lig][col+2]=="J1" or plateauPion[lig-1][col-2]=="J1" or plateauPion[lig-1][col+2]=="J1" or plateauPion[lig-2][col-1]=="J1" or plateauPion[lig-2][col]=="J1" or plateauPion[lig-2][col+1]=="J1":#vérifie si le pion risque de se faire manger au tour suivant
+                etat=1
+                return lig,col,etat
+
+
+            elif plateauPion[lig][col]=="g2": #la protection est prioritaire à l'attaque d'un autre pion
+                elif plateauPion[lig+2][col]=="g1" or plateauPion[lig+2][col+1]=="g1" or plateauPion[lig+2][col-1]=="g1" or plateauPion[lig+1][col+2]=="g1" or plateauPion[lig+1][col-2]=="g1" or plateauPion[lig][col-2]=="g1" or plateauPion[lig][col+2]=="g1" or plateauPion[lig-1][col-2]=="g1" or plateauPion[lig-1][col+2]=="g1" or plateauPion[lig-2][col-1]=="g1" or plateauPion[lig-2][col]=="g1" or plateauPion[lig-2][col+1]=="g1" or plateauPion[lig+2][col]=="J1" or plateauPion[lig+2][col+1]=="J1" or plateauPion[lig+2][col-1]=="J1" or plateauPion[lig+2][col-2]=="J1" or plateauPion[lig+1][col+2]=="J1" or plateauPion[lig+1][col-2]=="J1" or plateauPion[lig][col-2]=="J1" or plateauPion[lig][col+2]=="J1" or plateauPion[lig-1][col-2]=="J1" or plateauPion[lig-1][col+2]=="J1" or plateauPion[lig-2][col-1]=="J1" or plateauPion[lig-2][col]=="J1" or plateauPion[lig-2][col+1]=="J1":#vérifie si le pion risque de se faire manger au tour suivant
+                    etat=1
+                    return lig,col,etat
+
+
+            elif plateauPion[lig][col]=="J2": #l'attaque par la reine et d'une reine est prioritaire sur celle d'un  pion
+                if plateauPion[lig+1][col]=="J1" or plateauPion[lig+1][col+1]=="J1" or plateauPion[lig-1][col-1]=="J1" or plateauPion[lig][col+1]=="J1" or plateauPion[lig-1][col+1]=="J1" or plateauPion[lig+1][col-1]=="J1" or plateauPion[lig-1][col]=="J1" or plateauPion[lig][col-1]=="J1":#vérifie s'il y a une reine à manger aux alentours
+                    etat=3
+                    return lig,col,etat
+
+            elif plateauPion[lig][col]=="g2": #l'attaque d'une reine est prioritaire sur celle d'un  pion
+                if plateauPion[lig+1][col]=="J1" or plateauPion[lig+1][col+1]=="J1" or plateauPion[lig-1][col-1]=="J1" or plateauPion[lig][col+1]=="J1" or plateauPion[lig-1][col+1]=="J1" or plateauPion[lig+1][col-1]=="J1" or plateauPion[lig-1][col]=="J1" or plateauPion[lig][col-1]=="J1":#vérifie s'il y a une reine à manger aux alentours
+                    etat=3
+                    return lig,col,etat
+
+
+            elif plateauPion[lig][col]=="J2":#attaque par la reine d'un pion
+                if plateauPion[lig+1][col]=="g1" or plateauPion[lig+1][col+1]=="g1" or plateauPion[lig-1][col-1]=="g1" or plateauPion[lig][col+1]=="g1" or plateauPion[lig-1][col+1]=="g1" or plateauPion[lig+1][col-1]=="g1" or plateauPion[lig-1][col]=="g1" or plateauPion[lig][col-1]=="g1":#vérifie s'il y a un pion à manger aux alentours
+                    etat=2
+                    return lig,col,etat
+
+            elif plateauPion[lig][col]=="g2":#attaque par un pion d'un pion
+                if plateauPion[lig+1][col]=="g1" or plateauPion[lig+1][col+1]=="g1" or plateauPion[lig-1][col-1]=="g1" or plateauPion[lig][col+1]=="g1" or plateauPion[lig-1][col+1]=="g1" or plateauPion[lig+1][col-1]=="g1" or plateauPion[lig-1][col]=="g1" or plateauPion[lig][col-1]=="g1":
+                    etat=2
+                    return lig,col,etat
+
+    for lig in range (0,len(plateauPion)): #si aucune situation urgente n'a lieu, la stratégie peut se dérouler
+        for col in range(0,len(plateauPion[lig])):
+            if plateauPion=="g2":
+                return lig,col,etat
+    for lig in range (0,len(plateauPion)): #si aucune situation urgente n'a lieu et qu'il ne reste que la reine
+        for col in range(0,len(plateauPion[lig])):
+            if plateauPion=="J2":
+                return lig,col,etat
+
+
+
+
+
+
+## Fonction de choix et de vérification des déplacements Joueur
 
 def Dircolonne (col): #demande un déplacement sur les colonnes au joueur et vérifie qu'il ne sort pas du plateau
     possibilite = False #variable vérifiant la possibilité de déplacement
@@ -232,6 +342,118 @@ def Deplacementverifjoueur (lig, col, plateau):
         else:
             collision = False #la case n'est pas occupée
     return dirlig, dircol #retourne les déplacements qui ont été vérifiés comme valides
+
+
+## Fonction de choix et de vérification des déplacements IA
+
+def DircolonneIAprep (plateauPion,lig,col,tabResult):
+    colm=9
+    dircol = 1
+    for ligt in range (0,len(tabResult)):
+        for colt in range(0,len(tabResult[ligt])):
+
+            if colt==col and ligt==lig:#saute cette case
+                colm=colm
+
+            if tabResult[ligt][colt]=="M1" or tabResult[ligt][colt]=="M":#la reine cherche à aller sur le mâle disponible le plus proche
+                if colt-col==0:
+                    dircol=0
+                    return dircol
+                elif colt-col=1:
+                    dircol=1
+                    return dircol
+                elif colt-col==-1:
+                    dircol=-1
+                    return dircol
+                    #à placer autre part
+                elif abs(colt-col)<abs(colm-col):
+                    colm=colt
+                    if colm>col:
+                        dircol=1
+                        return dircol
+                    elif colm=col:
+                        dircol=0
+                        return dircol
+                    elif colm<col:
+                        dircol=-1
+                        return dircol
+                    #
+            if tabResult[ligt][colt]=="P":#la reine ne se déplace que sur des cases P de préférence
+                if colt-col==0:
+                    for ligt in range (0,len(tabResult)):
+                        for colt in range(0,len(tabResult[ligt])):
+
+                            if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":#si cela permet à la reine de se rapprocher du mâle le plus proche
+                                if abs(colk-col)<abs(colm-col):
+                                    if colk-col==0:
+                                        dircol=0
+                                        return dircol
+                elif colt-col=1:
+                    for ligt in range (0,len(tabResult)):
+                        for colt in range(0,len(tabResult[ligt])):
+
+                            if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":
+                                if abs(colk-col)<abs(colm-col):
+                                    if colk-col==1:
+                                        dircol=1
+                                        return dircol
+                elif colt-col==-1:
+                    for ligt in range (0,len(tabResult)):
+                        for colt in range(0,len(tabResult[ligt])):
+
+                            if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":
+                                if abs(colk-col)<abs(colm-col):
+                                    if colk-col==-1:
+                                        dircol=-1
+                                        return dircol
+                #seule une colonne possède une case P
+                elif colt-col==0 and tabResult[lig-1][col+1]/="P" and tabResult[lig-1][col-1]/="P" and tabResult[lig][col+1]/="P" and tabResult[lig][col-1]/="P" and tabResult[lig+1][col+1]/="P" and tabResult[lig+1][col-1]/="P" : # si cela ne lui permet pas de se rapprocher d'un autre mâle et que c'est la seule case aux alentours où il y a un P
+                    dircol=0
+                    return dircol
+                elif colt-col==1 and tabResult[lig-1][col]/="P" and tabResult[lig-1][col-1]/="P" and tabResult[lig][col-1]/="P" and tabResult[lig+1][col]/="P" and tabResult[lig+1][col-1]/="P":
+                    dircol=1
+                    return dircol
+                elif colt-col==-1 and tabResult[lig-1][col+1]/="P" and tabResult[lig-1][col]/="P" and tabResult[lig][col+1]/="P" and tabResult[lig+1][col+1]/="P" and tabResult[lig+1][col]/="P":
+                    dircol=-1
+                    return dircol
+                #deux cases possèdent une case P (à faire)
+
+
+
+
+
+
+
+
+
+
+
+def DircolonneIA(etat,plateauPion,lig,col,tabResult):
+    dircol=0
+    if etat==3:#une reine est à manger
+        if plateauPion[lig][col+1]=="J2" or plateauPion[lig+1][col+1]=="J2" or plateauPion[lig-1][col+1]=="J2":#la reine est dans la colonne de droite
+            dircol=1
+        elif plateauPion[lig][col-1]=="J2" or plateauPion[lig+1][col-1]=="J2" or plateauPion[lig-1][col-1]=="J2":#la reine est dans la colonne de gauche
+            dircol=-1
+        elif plateauPion[lig+1][col]=="J2" or plateauPion[lig-1][col]=="J2":#la reine est dans la même colonne
+            dircol=0
+    if etat==2:#un pion est à manger
+        if plateauPion[lig][col+1]=="g2" or plateauPion[lig+1][col+1]=="g2" or plateauPion[lig-1][col+1]=="g2":
+            dircol=1
+        elif plateauPion[lig][col-1]=="g2" or plateauPion[lig+1][col-1]=="g2" or plateauPion[lig-1][col-1]=="g2":
+            dircol=-1
+        elif plateauPion[lig+1][col]=="g2" or plateauPion[lig-1][col]=="g2":
+            dircol=0
+    if etat==1:#le pion doit fuir
+        if plateauPion[lig][col+2]=="g2" or plateauPion[lig+1][col+2]=="g2" or plateauPion[lig-1][col+2]=="g2" or plateauPion[lig][col+2]=="J2" or plateauPion[lig+1][col+2]=="J2" or plateauPion[lig-1][col+2]=="J2" or plateauPion[lig+2][col+1]=="g2" or plateauPion[lig-2][col+1]=="g2" or plateauPion[lig+2][col+1]=="J2" or plateauPion[lig-2][col+1]=="J2":
+            dircol=-1
+        elif plateauPion[lig][col-2]=="g2" or plateauPion[lig+1][col-2]=="g2" or plateauPion[lig-1][col-2]=="g2" or plateauPion[lig][col-2]=="J2" or plateauPion[lig+1][col-2]=="J2" or plateauPion[lig-1][col-2]=="J2" or plateauPion[lig+2][col-1]=="g2" or plateauPion[lig-2][col-1]=="g2" :
+            dircol=+1
+        elif plateauPion[lig+2][col]=="g2" or plateauPion[lig-2][col]=="g2":
+            dircol=0#à déterminer avec la stratégie
+    return dircol
+
+
 
 ## Fonction de déplacement
 
@@ -423,6 +645,13 @@ def J1PeutJouer(plateauPion):
             if(plateauPion[lig][col] == "J1" or plateauPion[lig][col] == "g1"):
                 return True
 
+    return False
+
+def IApeutjouer (plateauPion):
+    for lig in range (0,len(plateauPion)):
+        for col in range (0,len(plateauPion[lig])):
+            if (plateauPion [lig][col]=="J2" or plateauPion[lig][col] == "g2"):
+                return True
     return False
 
 def Jeu():
