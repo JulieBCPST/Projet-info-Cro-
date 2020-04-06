@@ -352,72 +352,70 @@ def DircolonneIAprep (plateauPion,lig,col,tabResult):
     for ligt in range (0,len(tabResult)):
         for colt in range(0,len(tabResult[ligt])):
 
-            if colt==col and ligt==lig:#saute cette case
-                colm=colm
+            if colt/=col and ligt==lig or col==colt and ligt/=lig or colt/=col and ligt/=lig :#saute la case de la grenouille
 
-            if tabResult[ligt][colt]=="M1" or tabResult[ligt][colt]=="M":#la reine cherche à aller sur le mâle disponible le plus proche
-                if colt-col==0:
-                    dircol=0
-                    return dircol
-                elif colt-col=1:
-                    dircol=1
-                    return dircol
-                elif colt-col==-1:
-                    dircol=-1
-                    return dircol
-                    #à placer autre part
-                elif abs(colt-col)<abs(colm-col):
-                    colm=colt
-                    if colm>col:
-                        dircol=1
-                        return dircol
-                    elif colm=col:
+                if tabResult[ligt][colt]=="M1" or tabResult[ligt][colt]=="M":#la reine cherche à aller sur le mâle disponible le plus proche
+                    if colt-col==0:
                         dircol=0
                         return dircol
-                    elif colm<col:
+                    elif colt-col=1:
+                        dircol=1
+                        return dircol
+                    elif colt-col==-1:
                         dircol=-1
                         return dircol
+                    #à placer autre part
+                    elif abs(colt-col)<abs(colm-col):
+                        colm=colt
+                        if colm>col:
+                            dircol=1
+                            return dircol
+                        elif colm=col:
+                            dircol=0
+                            return dircol
+                        elif colm<col:
+                            dircol=-1
+                            return dircol
                     #
-            if tabResult[ligt][colt]=="P":#la reine ne se déplace que sur des cases P de préférence
-                if colt-col==0:
-                    for ligt in range (0,len(tabResult)):
-                        for colt in range(0,len(tabResult[ligt])):
+                if tabResult[ligt][colt]=="P":#la reine ne se déplace que sur des cases P de préférence
+                    if colt-col==0:
+                        for ligt in range (0,len(tabResult)):
+                            for colt in range(0,len(tabResult[ligt])):
 
-                            if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":#si cela permet à la reine de se rapprocher du mâle le plus proche
-                                if abs(colk-col)<abs(colm-col):
-                                    if colk-col==0:
-                                        dircol=0
-                                        return dircol
-                elif colt-col=1:
-                    for ligt in range (0,len(tabResult)):
-                        for colt in range(0,len(tabResult[ligt])):
+                                if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":#si cela permet à la reine de se rapprocher du mâle le plus proche
+                                    if abs(colk-col)<abs(colm-col):
+                                        if colk-col==0:
+                                            dircol=0
+                                            return dircol
+                    elif colt-col=1:
+                        for ligt in range (0,len(tabResult)):
+                            for colt in range(0,len(tabResult[ligt])):
 
-                            if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":
-                                if abs(colk-col)<abs(colm-col):
-                                    if colk-col==1:
-                                        dircol=1
-                                        return dircol
-                elif colt-col==-1:
-                    for ligt in range (0,len(tabResult)):
-                        for colt in range(0,len(tabResult[ligt])):
+                                if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":
+                                    if abs(colk-col)<abs(colm-col):
+                                        if colk-col==1:
+                                            dircol=1
+                                            return dircol
+                    elif colt-col==-1:
+                        for ligt in range (0,len(tabResult)):
+                            for colt in range(0,len(tabResult[ligt])):
 
-                            if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":
-                                if abs(colk-col)<abs(colm-col):
-                                    if colk-col==-1:
-                                        dircol=-1
-                                        return dircol
+                                if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":
+                                    if abs(colk-col)<abs(colm-col):
+                                        if colk-col==-1:
+                                            dircol=-1
+                                            return dircol
                 #seule une colonne possède une case P
-                elif colt-col==0 and tabResult[lig-1][col+1]/="P" and tabResult[lig-1][col-1]/="P" and tabResult[lig][col+1]/="P" and tabResult[lig][col-1]/="P" and tabResult[lig+1][col+1]/="P" and tabResult[lig+1][col-1]/="P" : # si cela ne lui permet pas de se rapprocher d'un autre mâle et que c'est la seule case aux alentours où il y a un P
-                    dircol=0
-                    return dircol
-                elif colt-col==1 and tabResult[lig-1][col]/="P" and tabResult[lig-1][col-1]/="P" and tabResult[lig][col-1]/="P" and tabResult[lig+1][col]/="P" and tabResult[lig+1][col-1]/="P":
-                    dircol=1
-                    return dircol
-                elif colt-col==-1 and tabResult[lig-1][col+1]/="P" and tabResult[lig-1][col]/="P" and tabResult[lig][col+1]/="P" and tabResult[lig+1][col+1]/="P" and tabResult[lig+1][col]/="P":
-                    dircol=-1
-                    return dircol
+                    elif colt-col==0 and tabResult[lig-1][col+1]/="P" and tabResult[lig-1][col-1]/="P" and tabResult[lig][col+1]/="P" and tabResult[lig][col-1]/="P" and tabResult[lig+1][col+1]/="P" and tabResult[lig+1][col-1]/="P" : # si cela ne lui permet pas de se rapprocher d'un autre mâle et que c'est la seule case aux alentours où il y a un P
+                        dircol=0
+                        return dircol
+                    elif colt-col==1 and tabResult[lig-1][col]/="P" and tabResult[lig-1][col-1]/="P" and tabResult[lig][col-1]/="P" and tabResult[lig+1][col]/="P" and tabResult[lig+1][col-1]/="P":
+                        dircol=1
+                        return dircol
+                    elif colt-col==-1 and tabResult[lig-1][col+1]/="P" and tabResult[lig-1][col]/="P" and tabResult[lig][col+1]/="P" and tabResult[lig+1][col+1]/="P" and tabResult[lig+1][col]/="P":
+                        dircol=-1
+                        return dircol
                 #deux cases possèdent une case P (à faire)
-
 
 
 
