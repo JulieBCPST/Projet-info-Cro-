@@ -346,82 +346,370 @@ def Deplacementverifjoueur (lig, col, plateau):
 
 ## Fonction de choix et de vérification des déplacements IA
 
-def DircolonneIAprep (plateauPion,lig,col,tabResult):
-    colm=9
-    dircol = 1
-    for ligt in range (0,len(tabResult)):
-        for colt in range(0,len(tabResult[ligt])):
 
-            if colt/=col and ligt==lig or col==colt and ligt/=lig or colt/=col and ligt/=lig :#saute la case de la grenouille
+##Colonne
+def DircolonneIAprepprotection(plateauPion,lig,col,tabResult):
+    L=[]
+    P=[]
+    Deplacement=False
+    Safe=True
+    Proche=False
+    for liga in range (0,len(tabResult)):
+        for cola in range(0,len(tabResult[liga])):
+            if cola!=col and liga==lig or col==cola and liga!=lig or cola!=col and liga!=lig :#saute la case de la grenouille
+
+                if tabResult[liga][cola]=="g2" or tabResult[liga][cola]=="J2":#le pion doit savoir tous les dangers qu'il y a autour
+                    if cola==col and liga==lig+2 or cola==col and liga==lig-2 or cola==col+1 and liga==lig+2 or cola==col+1 and liga==lig-2 or cola==col-1 and liga==lig+2 or cola==col-1 and liga==lig-2 or cola==col+2 and liga==lig or cola==col+2 and liga==lig+1 or cola==col+2 and liga==lig-1 or cola==col-2 and liga==lig or cola==col-2 and liga==lig+2 or cola==col-2 and liga==lig-2:
+                        P.append(cola)
+    for ligt in range (0,len(tabResult)):#cherche la case la plus propice sur laquelle aller
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la case de la grenouille
 
                 if tabResult[ligt][colt]=="M1" or tabResult[ligt][colt]=="M":#la reine cherche à aller sur le mâle disponible le plus proche
-                    if colt-col==0:
-                        dircol=0
-                        return dircol
-                    elif colt-col=1:
-                        dircol=1
-                        return dircol
-                    elif colt-col==-1:
-                        dircol=-1
-                        return dircol
-                    #à placer autre part
-                    elif abs(colt-col)<abs(colm-col):
-                        colm=colt
-                        if colm>col:
-                            dircol=1
-                            return dircol
-                        elif colm=col:
-                            dircol=0
-                            return dircol
-                        elif colm<col:
-                            dircol=-1
-                            return dircol
-                    #
-                if tabResult[ligt][colt]=="P":#la reine ne se déplace que sur des cases P de préférence
-                    if colt-col==0:
-                        for ligt in range (0,len(tabResult)):
-                            for colt in range(0,len(tabResult[ligt])):
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt:
+                                Safe=False
+                    if colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 :
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt+1:
+                                Safe=False
+                    if colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt-1:
+                                Safe =False
+                    if Safe and Proche:
+                        L.append(colt)
+                        Deplacement=True
+    if Deplacement:    #ne lance le choix de déplacement que s'il L est non vide
+        dircol=randint(0,len(L)-1)-col # même probabilité d'aller sur chacun des mâles à proximité
+        return dircol
+    #à continuer avec la stratégie
+    for ligt in range (0,len(tabResult)):#cherche la case la plus propice sur laquelle aller
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la case de la grenouille
 
-                                if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":#si cela permet à la reine de se rapprocher du mâle le plus proche
-                                    if abs(colk-col)<abs(colm-col):
-                                        if colk-col==0:
-                                            dircol=0
-                                            return dircol
-                    elif colt-col=1:
-                        for ligt in range (0,len(tabResult)):
-                            for colt in range(0,len(tabResult[ligt])):
+                if tabResult[ligt][colt]=="P":#la stratégie est de chercher les mâles et de s'en rapprocher
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt:
+                                Safe=False
+                    if colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 :
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt+1:
+                                Safe=False
+                    if colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt-1:
+                                Safe =False
+                    if Safe and Proche:
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test and Safe:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                        probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                            L.append(colt)
+                            Deplacement=True
+    if Deplacement:    #ne lance le choix de déplacement que s'il L est non vide
+        dircol=randint(0,len(L)-1)-col # même probabilité d'aller sur chacun des mâles à proximité
+        return dircol
+    for ligt in range (0,len(tabResult)):#cherche la case la plus propice sur laquelle aller
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la case de la grenouille
 
-                                if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":
-                                    if abs(colk-col)<abs(colm-col):
-                                        if colk-col==1:
-                                            dircol=1
-                                            return dircol
-                    elif colt-col==-1:
-                        for ligt in range (0,len(tabResult)):
-                            for colt in range(0,len(tabResult[ligt])):
+                if tabResult[ligt][colt]=="N":#la reine cherche à aller sur le mâle disponible le plus proche
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt:
+                                Safe=False
+                    if colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 :
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt+1:
+                                Safe=False
+                    if colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt-1:
+                                Safe =False
+                    if Safe and Proche:
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test and Safe:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                        probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                            L.append(colt)
+                            Deplacement=True
+    if Deplacement:    #ne lance le choix de déplacement que s'il L est non vide
+        dircol=randint(0,len(L)-1)-col # même probabilité d'aller sur chacun des mâles à proximité
+        return dircol
+    for ligt in range (0,len(tabResult)):#cherche la case la plus propice sur laquelle aller
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la case de la grenouille
 
-                                if tabResult[ligt][colk]=="M1" or tabResult[ligt][colk]=="M":
-                                    if abs(colk-col)<abs(colm-col):
-                                        if colk-col==-1:
-                                            dircol=-1
-                                            return dircol
-                #seule une colonne possède une case P
-                    elif colt-col==0 and tabResult[lig-1][col+1]/="P" and tabResult[lig-1][col-1]/="P" and tabResult[lig][col+1]/="P" and tabResult[lig][col-1]/="P" and tabResult[lig+1][col+1]/="P" and tabResult[lig+1][col-1]/="P" : # si cela ne lui permet pas de se rapprocher d'un autre mâle et que c'est la seule case aux alentours où il y a un P
-                        dircol=0
-                        return dircol
-                    elif colt-col==1 and tabResult[lig-1][col]/="P" and tabResult[lig-1][col-1]/="P" and tabResult[lig][col-1]/="P" and tabResult[lig+1][col]/="P" and tabResult[lig+1][col-1]/="P":
-                        dircol=1
-                        return dircol
-                    elif colt-col==-1 and tabResult[lig-1][col+1]/="P" and tabResult[lig-1][col]/="P" and tabResult[lig][col+1]/="P" and tabResult[lig+1][col+1]/="P" and tabResult[lig+1][col]/="P":
-                        dircol=-1
-                        return dircol
-                #deux cases possèdent une case P (à faire)
+                if tabResult[ligt][colt]=="I" or tabResult[ligt][colt]=="R":#la reine cherche à aller sur le mâle disponible le plus proche
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt:
+                                Safe=False
+                    if colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 :
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt+1:
+                                Safe=False
+                    if colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt-1:
+                                Safe =False
+                    if Safe and Proche:
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test and Safe:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                        probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                            L.append(colt)
+                            Deplacement=True
+    if Deplacement:    #ne lance le choix de déplacement que s'il L est non vide
+        dircol=randint(0,len(L)-1)-col # même probabilité d'aller sur chacun des mâles à proximité
+        return dircol
+    for ligt in range (0,len(tabResult)):#cherche la case la plus propice sur laquelle aller
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la case de la grenouille
+
+                if tabResult[ligt][colt]=="V":#la reine cherche à aller sur le mâle disponible le plus proche
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt:
+                                Safe=False
+                    if colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 :
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt+1:
+                                Safe=False
+                    if colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt-1:
+                                Safe =False
+                    if Safe and Proche:
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test and Safe:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                        probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                            L.append(colt)
+                            Deplacement=True
+    if Deplacement:    #ne lance le choix de déplacement que s'il L est non vide
+        dircol=randint(0,len(L)-1)-col # même probabilité d'aller sur chacun des mâles à proximité
+        return dircol
+    for ligt in range (0,len(tabResult)):#cherche la case la plus propice sur laquelle aller
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la case de la grenouille
+
+                if tabResult[ligt][colt]=="D":#la reine cherche à aller sur le mâle disponible le plus proche
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt:
+                                Safe=False
+                    if colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 :
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt+1:
+                                Safe=False
+                    if colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:
+                        Proche=True
+                        for test in (P):
+                            if test==colt or test==colt-1:
+                                Safe =False
+                    if Safe and Proche:
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test and Safe:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                        probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                            L.append(colt)
+                            Deplacement=True
+    if Deplacement:    #ne lance le choix de déplacement que s'il L est non vide
+        dircol=randint(0,len(L)-1)-col # même probabilité d'aller sur chacun des mâles à proximité
+        return dircol
 
 
 
 
 
 
+
+def DircolonneIAprepstrat(plateauPion,lig,col,tabResult): #nouvelle, construite avec des listes
+    L=[]
+    Deplacement=False#la liste L est vide
+    for ligt in range (0,len(tabResult)):
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la case de la grenouille
+
+                if tabResult[ligt][colt]=="M1" or tabResult[ligt][colt]=="M":#la reine cherche à aller sur le mâle disponible le plus proche
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1 or colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 or colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:
+                        Deplacement=True
+                        L.append(colt)
+
+    if Deplacement:    #ne lance le choix de déplacement que s'il L est non vide
+        dircol=randint(0,len(L)-1)-col # même probabilité d'aller sur chacun des mâles à proximité
+        return dircol
+    for ligt in range (0,len(tabResult)): #relance une recherche
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la grenouille
+                if tabResult[ligt][colt]=="P" :#si la case est un chemin prudent
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1 or colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 or colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:#si la case est à proximité de la grenouille
+                        Deplacement=True
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                            probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                        L.append(colt)#rajoute au moins une fois la colonne sur laquelle la grenouille peut se rendre
+    if Deplacement:
+        dircol=randint(0,len(L)-1)-col#les probabilités différentes sont prises en compte par le nombre de fois où apparait une colonne
+        return dircol
+    for ligt in range (0,len(tabResult)): #relance une recherche
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la grenouille
+                if tabResult[ligt][colt]=="N" :#si la case est un nénuphar sûr et permet donc de rejouer la reine
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1 or colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 or colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:#si la case est à proximité de la grenouille
+                        Deplacement=True
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                        probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                        L.append(colt)#rajoute au moins une fois la colonne sur laquelle la grenouille peut se rendre
+    if Deplacement:
+        dircol=randint(0,len(L)-1)-col#les probabilités différentes sont prises en compte par le nombre de fois où apparait une colonne
+        return dircol
+    for ligt in range (0,len(tabResult)): #relance une recherche
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la grenouille
+                if tabResult[ligt][colt]=="R" or tabResult[ligt][colt]=="I":#si la case fait arrêter le tour (avec Insecte, l'IA choisit toujours de ne pas jouer d'autre pion en phase préparation)
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1 or colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 or colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:#si la case est à proximité de la grenouille
+                        Deplacement=True
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                            probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                        L.append(colt)#rajoute au moins une fois la colonne sur laquelle la grenouille peut se rendre
+    if Deplacement:
+        dircol=randint(0,len(L)-1)-col#les probabilités différentes sont prises en compte par le nombre de fois où apparait une colonne
+        return dircol
+    for ligt in range (0,len(tabResult)): #relance une recherche
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la grenouille
+                if tabResult[ligt][colt]=="V" : # en phase préparation la reine préfère être dans la vase que risquer un brochet
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1 or colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 or colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:#si la case est à proximité de la grenouille
+                        Deplacement=True
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                            probarenforce=testMc-colt#compte le nombre de colonnes séparant le mâle et le pion
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                        L.append(colt)#rajoute au moins une fois la colonne sur laquelle la grenouille peut se rendre
+    if Deplacement:
+        dircol=randint(0,len(L)-1)-col#les probabilités différentes sont prises en compte par le nombre de fois où apparait une colonne
+        return dircol
+    for ligt in range (0,len(tabResult)): #relance une recherche
+        for colt in range(0,len(tabResult[ligt])):
+            if colt!=col and ligt==lig or col==colt and ligt!=lig or colt!=col and ligt!=lig :#saute la grenouille
+                if tabResult[ligt][colt]=="D" : #dernier recours(l'IA n'ira jamais sur un brochet découvert"
+                    if colt==col and ligt==lig+1 or colt==col and ligt==lig-1 or colt==col+1 and ligt==lig or colt==col+1 and ligt==lig+1 or colt==col+1 and ligt==lig-1 or colt==col-1 and ligt==lig or colt==col-1 and ligt==lig+1 or colt==col-1 and ligt==lig-1:#si la case est à proximité de la grenouille
+                        Deplacement=True
+                        Test=True #vérifie que pour une colonne le test de raprochement de mâle n'ait été fait qu'une seule fois
+                        for i in range (len(L)):
+                            if L[i] == colt:
+                                Test=False
+                        if Test:
+                            for testM in range (0,len(tabResult)):#parcourt le plateau pour voir si le déplacement la rapprocherait d'un mâle, augmente la probabilité de cette direction de colonne
+                                for testMc in range (0,len(tabResult[testM])):
+                                    if testMc==colt:
+                                        if tabResult[testM][testMc]=="M" or tabResult[testM][testMc]=="M1":
+                                            probarenforce=testMc-colt
+                                            for i in range (2,len(L)-probarenforce):#rajoute plus de colt si le mâle est plus proche, augmente la probabilité de s'y rendre
+                                                L.append(colt)
+                        L.append(colt)#rajoute au moins une fois la colonne sur laquelle la grenouille peut se rendre
+    if Deplacement:
+        dircol=randint(0,len(L)-1)-col#les probabilités différentes sont prises en compte par le nombre de fois où apparait une colonne
+        return dircol
 
 
 
@@ -435,27 +723,26 @@ def DircolonneIA(etat,plateauPion,lig,col,tabResult):
             dircol=-1
         elif plateauPion[lig+1][col]=="J2" or plateauPion[lig-1][col]=="J2":#la reine est dans la même colonne
             dircol=0
-    if etat==2:#un pion est à manger
+    elif etat==1:#le pion doit fuir
+        dircol=DircolonneIAprepprotection(plateauPion,lig,col,tabResult)
+    elif etat==2:#un pion est à manger
         if plateauPion[lig][col+1]=="g2" or plateauPion[lig+1][col+1]=="g2" or plateauPion[lig-1][col+1]=="g2":
             dircol=1
         elif plateauPion[lig][col-1]=="g2" or plateauPion[lig+1][col-1]=="g2" or plateauPion[lig-1][col-1]=="g2":
             dircol=-1
         elif plateauPion[lig+1][col]=="g2" or plateauPion[lig-1][col]=="g2":
             dircol=0
-    if etat==1:#le pion doit fuir
-        if plateauPion[lig][col+2]=="g2" or plateauPion[lig+1][col+2]=="g2" or plateauPion[lig-1][col+2]=="g2" or plateauPion[lig][col+2]=="J2" or plateauPion[lig+1][col+2]=="J2" or plateauPion[lig-1][col+2]=="J2" or plateauPion[lig+2][col+1]=="g2" or plateauPion[lig-2][col+1]=="g2" or plateauPion[lig+2][col+1]=="J2" or plateauPion[lig-2][col+1]=="J2":
-            dircol=-1
-        elif plateauPion[lig][col-2]=="g2" or plateauPion[lig+1][col-2]=="g2" or plateauPion[lig-1][col-2]=="g2" or plateauPion[lig][col-2]=="J2" or plateauPion[lig+1][col-2]=="J2" or plateauPion[lig-1][col-2]=="J2" or plateauPion[lig+2][col-1]=="g2" or plateauPion[lig-2][col-1]=="g2" :
-            dircol=+1
-        elif plateauPion[lig+2][col]=="g2" or plateauPion[lig-2][col]=="g2":
-            dircol=0#à déterminer avec la stratégie
+    else:
+        dircol=DircolonneIAprepstrat(plateauPion,lig,col,tabResult)
     return dircol
+
+## Ligne
 
 
 
 ## Fonction de déplacement
 
-
+##Joueur
 # déplace le pion en fonction du choix du joueur et supprime l'ancien emplacement
 def Deplacement(plateauPion,plateauCarte,plateauVisible):
     col,lig = RecherchePionS(plateauPion,plateauCarte,plateauVisible) # retourne les coordonnées du pion séléctionné
@@ -474,6 +761,8 @@ def DeplacementN (plateauPion,plateauCarte,plateauVisible,col,lig):
     lig=dirlig+lig
     return plateauPion,plateauCarte,plateauVisible,lig,col
 
+
+##IA
 
 
 
